@@ -60,19 +60,24 @@ The system follows a layered backend architecture:
 | Reporting      | FPDF (PDF Generator) |
 
 
-## 📂 Project Structure
+## Project Structure
 
+```
 AgeWell/
 ├── app/
-│   ├── routes/        # API endpoints
-│   ├── services/      # Business logic
-│   ├── models/        # Model artifacts and schema-related logic
-│   └── utils/         # Helper functions
-├── data/              # Dataset files
-├── config/            # Configuration files
-├── app.py             # Application entry point
+│   ├── routes/
+│   ├── services/
+│   │   └── newpatient.py
+│   ├── models/
+│   │   └── agewell_model.joblib
+│   └── utils/
+├── data/
+│   └── agewell_data.csv
+├── config/
+├── app.py
 ├── requirements.txt
 └── README.md
+```
 
 ## How to Run
 
