@@ -66,27 +66,60 @@ The system follows a layered backend architecture:
 AgeWell/
 ├── app/
 │   ├── routes/
+│   │   └── api.py            # Flask REST API entry layer
 │   ├── services/
-│   │   └── newpatient.py
+│   │   ├── health_service.py # Business logic: BMI, score, recommendations, workflow
+│   │   └── newpatient.py     # CLI entry point
 │   ├── models/
+│   │   ├── predictor.py      # Loads/serves the trained ML model
 │   │   └── agewell_model.joblib
 │   └── utils/
+│       ├── db.py             # MySQL connection & queries
+│       ├── pdf_report.py     # PDF report generation
+│       └── email_utils.py    # High-risk email alerts
+├── config/
+│   ├── config.py             # Env-driven configuration
+│   └── init_db.py            # Creates the health_records table
 ├── data/
 │   └── agewell_data.csv
-├── config/
-├── app.py
+├── app.py                    # Streamlit UI entry point
 ├── requirements.txt
+├── .env.example
 └── README.md
 ```
 
 ## How to Run
 
 1. Clone the repository
+   ```
    git clone <repo-link>
+   ```
 
 2. Install dependencies
+   ```
    pip install -r requirements.txt
+   ```
 
-3. Run the application
-   python app.py
+3. Configure environment variables
+   ```
+   cp .env.example .env
+   # edit .env with your MySQL credentials and (optionally) email alert settings
+   ```
+
+4. Create the database schema
+   ```
+   python -m config.init_db
+   ```
+
+5. Run the application
+   - Streamlit UI: `streamlit run app.py`
+   - CLI: `python -m app.services.newpatient`
+   - REST API: `python -m app.routes.api`
+
+### Configuration
+
+All secrets and environment-specific settings (DB credentials, email alert
+credentials, model path) are read from environment variables via
+`config/config.py` and `.env` — never hardcode credentials in source files.
+See `.env.example` for the full list of variables.
 
