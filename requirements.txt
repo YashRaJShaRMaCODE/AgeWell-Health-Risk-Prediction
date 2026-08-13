@@ -8,3 +8,5 @@ pyttsx3
 streamlit
 fpdf
 mysql-connector-python
+python-dotenv
+flask
