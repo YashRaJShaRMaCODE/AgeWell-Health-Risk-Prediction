@@ -4,7 +4,9 @@ AgeWell is a Python-based backend system designed to manage elderly health data,
 perform risk scoring, and support backend workflows such as data storage,
 processing, and reporting using a relational database.
 
-This system helps caregivers make informed decisions through real-time analytics and personalized recommendations.
+This prototype demonstrates a data-processing and reporting workflow for health-related inputs.
+
+> **Research demo only:** Predictions, scores, and suggested plans are not a diagnosis or medical advice. Do not use this project to make care decisions or process real patient data. Clinical validation, privacy review, and access controls appropriate to your jurisdiction are required before any real-world use.
 ## System Architecture
 
 The system follows a layered backend architecture:
@@ -105,6 +107,8 @@ AgeWell/
    cp .env.example .env
    # edit .env with your MySQL credentials and (optionally) email alert settings
    ```
+
+   For REST API use, set `AGEWELL_API_TOKEN` to a unique random secret of at least 32 characters in `.env` (for example, generate one with `python -c "import secrets; print(secrets.token_urlsafe(32))"`). The `/predict` and `/records` routes require `Authorization: Bearer <token>`. Prediction requests do not save records or generate reports unless `save_to_db` or `generate_pdf` is explicitly set to `true`.
 
 4. Create the database schema
    ```

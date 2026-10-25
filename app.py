@@ -14,12 +14,17 @@ LOGO_PATH = "assets/agewell_logo.png"
 col1, col2 = st.columns([8, 2])
 with col1:
     st.markdown("<h1 style='color:#0B6AFF; margin-bottom:2px;'>AgeWell — Elderly Health Risk Predictor</h1>", unsafe_allow_html=True)
-    st.markdown("AI-powered predictions, recommendations and live storage.")
+    st.markdown("Prototype risk estimates and optional record storage.")
 with col2:
     if os.path.exists(LOGO_PATH):
         st.image(LOGO_PATH, width=120)
 
 st.markdown("---")
+
+st.warning(
+    "Research demo only. Predictions and suggestions are not a diagnosis or medical advice. "
+    "Do not use this app to make care decisions or enter real patient data."
+)
 
 st.subheader("Enter patient details")
 c1, c2, c3 = st.columns(3)
@@ -55,7 +60,7 @@ if predict_btn:
             result = None
 
     if result:
-        st.success(f"Prediction: **{result.risk_label} Risk**")
+        st.success(f"Model estimate: **{result.risk_label} Risk** (not clinically validated)")
         st.write(f"**BMI:** {result.bmi}  |  **Health Score:** {result.health_score}")
         st.markdown("**Food Plan:** " + result.food_plan)
         st.markdown("**Exercise Plan:** " + result.exercise_plan)
