@@ -71,8 +71,8 @@ def evaluate_patient(age, hr, bp, chol, weight, height) -> PredictionResult:
     )
 
 
-def process_patient(age, hr, bp, chol, weight, height, save_to_db=True,
-                     generate_pdf=True, send_alert=None) -> PredictionResult:
+def process_patient(age, hr, bp, chol, weight, height, save_to_db=False,
+                     generate_pdf=False, send_alert=None) -> PredictionResult:
     """Full workflow: predict, optionally persist to MySQL, generate a PDF
     report, and send an email alert for high-risk patients."""
     result = evaluate_patient(age, hr, bp, chol, weight, height)

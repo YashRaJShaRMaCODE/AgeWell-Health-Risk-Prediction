@@ -120,6 +120,10 @@ AgeWell/
    - CLI: `python -m app.services.newpatient`
    - REST API: `python -m app.routes.api`
 
+The Streamlit demo predicts without saving by default. Database writes, PDF creation,
+and high-risk email alerts require explicit opt-in. Generated PDFs remain in the
+local `reports/` folder until removed; continue to use synthetic data only.
+
 ### Configuration
 
 All secrets and environment-specific settings (DB credentials, email alert

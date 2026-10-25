@@ -17,7 +17,9 @@ def main():
     weight = float(input("Weight (kg): "))
     height = float(input("Height (m): "))
 
-    result = process_patient(age, hr, bp, chol, weight, height)
+    result = process_patient(
+        age, hr, bp, chol, weight, height, save_to_db=True, generate_pdf=True
+    )
 
     print(f"\n✅ Predicted Risk: {result.risk_label}")
     print(f"📊 BMI: {result.bmi} | 🧮 Health Score: {result.health_score}")

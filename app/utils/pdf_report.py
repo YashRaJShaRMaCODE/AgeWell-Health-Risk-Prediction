@@ -1,5 +1,6 @@
 """PDF report generation for AgeWell patient health reports."""
 import os
+import uuid
 from datetime import datetime
 
 from fpdf import FPDF
@@ -81,6 +82,6 @@ def generate_health_report(pid, age, hr, bp, chol, bmi, score, risk, food, exerc
         "Research demo only. This report is not a diagnosis or medical advice and must not be used to make care decisions.",
     )
 
-    filename = os.path.join(output_dir, f"AgeWell_Report_Patient_{pid}.pdf")
+    filename = os.path.join(output_dir, f"AgeWell_Report_Patient_{pid}_{uuid.uuid4().hex[:12]}.pdf")
     pdf.output(filename)
     return filename
