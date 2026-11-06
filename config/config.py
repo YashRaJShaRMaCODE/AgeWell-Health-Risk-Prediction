@@ -14,6 +14,7 @@ DB_CONFIG = {
     "password": os.getenv("DB_PASSWORD", ""),
     "database": os.getenv("DB_NAME", "agewell_db"),
 }
+DB_CONFIGURED = all(os.getenv(key) for key in ("DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME"))
 
 EMAIL_CONFIG = {
     "sender": os.getenv("EMAIL_SENDER", ""),

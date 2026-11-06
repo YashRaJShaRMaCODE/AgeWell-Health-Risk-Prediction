@@ -7,7 +7,7 @@ import streamlit as st
 
 from app.services.health_service import process_patient
 from app.utils import db
-from config.config import EMAIL_ALERTS_ENABLED
+from config.config import DB_CONFIGURED, EMAIL_ALERTS_ENABLED
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +76,7 @@ with colA:
 with colB:
     pdf_btn = st.button("Download Last Report")
 with colC:
-    insert_toggle = st.checkbox("Save record to MySQL", value=False)
+    insert_toggle = st.checkbox("Save record to MySQL", value=False, disabled=not DB_CONFIGURED)
     pdf_toggle = st.checkbox("Create a PDF report", value=False)
     alert_toggle = st.checkbox(
         "Email high-risk alert (requires saved record + PDF)",
@@ -142,7 +142,9 @@ if pdf_btn:
 st.markdown("---")
 
 st.subheader("Latest records (MySQL)")
-if st.button("Refresh table from DB"):
+if not DB_CONFIGURED:
+    st.info("Database storage is not configured for this demo. Predictions are not saved.")
+elif st.button("Refresh table from DB"):
     try:
         df = db.fetch_latest_records(limit=20)
         st.dataframe(df)
