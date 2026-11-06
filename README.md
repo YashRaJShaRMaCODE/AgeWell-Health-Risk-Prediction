@@ -1,133 +1,70 @@
-# AgeWell – Backend Health Risk Management System
+# AgeWell
 
-AgeWell is a Python-based backend system designed to manage elderly health data,
-perform risk scoring, and support backend workflows such as data storage,
-processing, and reporting using a relational database.
+An educational health-risk prediction prototype with a Streamlit demo and an optional authenticated Flask API.
 
-This prototype demonstrates a data-processing and reporting workflow for health-related inputs.
+> **Research demo only.** The model is not clinically validated. Results and generated food/activity examples are not medical advice and must not guide care decisions. Use synthetic inputs only; never enter real patient or identifying information.
 
-> **Research demo only:** Predictions, scores, and suggested plans are not a diagnosis or medical advice. Do not use this project to make care decisions or process real patient data. Clinical validation, privacy review, and access controls appropriate to your jurisdiction are required before any real-world use.
-## System Architecture
+## Live demo
 
-The system follows a layered backend architecture:
+https://agewell-risk-demo.onrender.com/
 
-- API / Entry Layer: Handles incoming requests and triggers backend workflows
-- Service Layer: Contains business logic for patient data processing and risk evaluation
-- Model Layer: Manages trained models and database-related structures
-- Data Layer: Stores structured patient data in a relational database
+The hosted demo does not save predictions, generate email alerts, or connect to a database. Inputs are processed by the public hosting service, so use sample values only.
 
----
+## What it does
 
-## 🚀 Features
+- Estimates a binary risk label from age, heart rate, systolic blood pressure and cholesterol.
+- Calculates a reference BMI and prototype score, then displays rule-based examples.
+- Supports optional PDF output and MySQL persistence when explicitly configured locally.
+- Provides an optional Flask API with bearer-token authentication; persistence and reports default off.
 
-### 🔹 1. Machine Learning-Based Health Prediction
-- Predicts **High / Low health risk**
-- Calculates **BMI**
-- Computes a **Health Score (0–100)**
+## Local setup
 
-### 🔹 2. Personalized Recommendations
-- Diet plan based on BMI & risk  
-- Exercise plan tailored to age and health score  
+Requires Python 3.12.11. Create a virtual environment, then install dependencies:
 
-### 🔹 3. Database Integration (MySQL)
-- Saves each patient’s records:
-  - Age, Heart Rate, BP, Cholesterol  
-  - BMI, Health Score  
-  - Food & Exercise plan  
-- Auto-increments patient ID
-
-### 🔹 4. Power BI Dashboard (Analytics)
-- Real-time insights after refresh
-- KPIs (Avg BP, BMI, Risk Count)
-- Line charts, scatter plots, donut charts
-- Recommendation table
-
-### 🔹 5. Streamlit Interface 
-- User-friendly UI for entering patient data
-- Shows prediction instantly
-- Displays database records inside app
-- Option to embed dashboard preview
-
----
-
-## 🛠️ Tech Stack
-
-| Component       | Technology Used |
-|----------------|----------------|
-| ML Model       | Logistic Regression (scikit-learn) |
-| Backend        | Python 3 |
-| Database       | MySQL |
-| Visualization  | Power BI Desktop |
-| Web UI         | Streamlit |
-| Reporting      | FPDF (PDF Generator) |
-
-
-## Project Structure
-
-```
-AgeWell/
-├── app/
-│   ├── routes/
-│   │   └── api.py            # Flask REST API entry layer
-│   ├── services/
-│   │   ├── health_service.py # Business logic: BMI, score, recommendations, workflow
-│   │   └── newpatient.py     # CLI entry point
-│   ├── models/
-│   │   ├── predictor.py      # Loads/serves the trained ML model
-│   │   └── agewell_model.joblib
-│   └── utils/
-│       ├── db.py             # MySQL connection & queries
-│       ├── pdf_report.py     # PDF report generation
-│       └── email_utils.py    # High-risk email alerts
-├── config/
-│   ├── config.py             # Env-driven configuration
-│   └── init_db.py            # Creates the health_records table
-├── data/
-│   └── agewell_data.csv
-├── app.py                    # Streamlit UI entry point
-├── requirements.txt
-├── .env.example
-└── README.md
+```powershell
+py -3.12 -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 ```
 
-## How to Run
+Start the demo:
 
-1. Clone the repository
-   ```
-   git clone <repo-link>
-   ```
+```powershell
+streamlit run app.py
+```
 
-2. Install dependencies
-   ```
-   pip install -r requirements.txt
-   ```
+Optional database, report and email settings are documented in `.env.example`. Keep all real secrets in a local `.env` file and never commit them. Database storage controls stay disabled until all required MySQL settings are present. Email alerts are off by default.
 
-3. Configure environment variables
-   ```
-   cp .env.example .env
-   # edit .env with your MySQL credentials and (optionally) email alert settings
-   ```
+## Optional API
 
-   For REST API use, set `AGEWELL_API_TOKEN` to a unique random secret of at least 32 characters in `.env` (for example, generate one with `python -c "import secrets; print(secrets.token_urlsafe(32))"`). The `/predict` and `/records` routes require `Authorization: Bearer <token>`. Prediction requests do not save records or generate reports unless `save_to_db` or `generate_pdf` is explicitly set to `true`.
+Set `AGEWELL_API_TOKEN` to a unique secret of at least 32 characters before starting the Flask API:
 
-4. Create the database schema
-   ```
-   python -m config.init_db
-   ```
+```powershell
+$env:AGEWELL_API_TOKEN = python -c "import secrets; print(secrets.token_urlsafe(32))"
+python -m app.routes.api
+```
 
-5. Run the application
-   - Streamlit UI: `streamlit run app.py`
-   - CLI: `python -m app.services.newpatient`
-   - REST API: `python -m app.routes.api`
+- `GET /health` — service health; no patient data.
+- `POST /predict` — requires `Authorization: Bearer <token>` and a JSON body containing `age`, `heart_rate`, `systolic_bp`, `cholesterol`, `weight`, and `height`.
+- `GET /records` — requires the same bearer token and a configured MySQL database.
 
-The Streamlit demo predicts without saving by default. Database writes, PDF creation,
-and high-risk email alerts require explicit opt-in. Generated PDFs remain in the
-local `reports/` folder until removed; continue to use synthetic data only.
+Prediction requests do not save records or create reports unless `save_to_db` or `generate_pdf` is explicitly set to `true`. Do not expose a token in browser code, logs, screenshots or a public repository.
 
-### Configuration
+## Project map
 
-All secrets and environment-specific settings (DB credentials, email alert
-credentials, model path) are read from environment variables via
-`config/config.py` and `.env` — never hardcode credentials in source files.
-See `.env.example` for the full list of variables.
+- `app.py` — Streamlit interface.
+- `app/routes/api.py` — authenticated Flask endpoints.
+- `app/services/health_service.py` — model workflow and opt-in side effects.
+- `app/models/` — predictor and serialized research model.
+- `app/utils/` — database, PDF and email helpers.
+- `tests/` — privacy-default and report-file checks.
 
+## Run checks
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+## Privacy and limitations
+
+This prototype has not been clinically validated or assessed for medical use. Public hosting is intended only for synthetic sample values. The hosted service has no database or email credentials configured, and the UI disables record storage until a complete local MySQL configuration is provided. Before any real-world use, obtain clinical, privacy, security and regulatory review, and build appropriate consent, access control, retention and monitoring.
