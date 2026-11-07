@@ -11,19 +11,27 @@ from config.config import DB_CONFIGURED, EMAIL_ALERTS_ENABLED
 
 logger = logging.getLogger(__name__)
 
-st.set_page_config(page_title="AgeWell - Health Risk Predictor", layout="wide")
+st.set_page_config(page_title="AgeWell · Research Demo", page_icon="🩺", layout="wide")
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
-.stApp{background:radial-gradient(ellipse at 90% 0,#d9e8e333,transparent 32%),#f5f7f5;color:#182a26;font-family:'DM Sans',sans-serif}
-[data-testid="stMain"] .block-container{max-width:1180px;padding:2.5rem clamp(1rem,4vw,3.5rem) 4rem}
-h1,h2,h3{font-family:'Manrope',sans-serif;letter-spacing:-.045em;color:#173c35}
-[data-testid="stAlert"]{border-radius:12px}
-[data-testid="stVerticalBlockBorderWrapper"]{border-color:#dce5df!important;border-radius:16px;background:#ffffffb8}
-div.stButton>button,div.stDownloadButton>button{min-height:44px;border-radius:8px;font-weight:700;transition:transform .18s ease,box-shadow .18s ease}
-div.stButton>button:hover,div.stDownloadButton>button:hover{transform:translateY(-2px);box-shadow:0 8px 22px #173c351c}
+:root{color-scheme:light;--ink:#183a33;--muted:#52665f;--paper:#f5f5ef;--leaf:#2f6d58;--amber:#e8ad4b}
+.stApp{background:linear-gradient(145deg,#eef2eb 0%,var(--paper) 44%,#f8f7f2 100%);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+[data-testid="stMain"] .block-container{max-width:1120px;padding:2rem clamp(1rem,4vw,3.25rem) 4rem}
+h1,h2,h3{color:var(--ink);letter-spacing:-.035em}
+.agewell-hero{position:relative;overflow:hidden;margin:.2rem 0 1.7rem;padding:clamp(1.6rem,4vw,3.3rem);border-radius:18px;background:var(--ink);color:#fbfaf4}
+.agewell-hero:after{position:absolute;right:-40px;top:-105px;width:310px;height:310px;border:1px solid #e8ad4b77;border-radius:50%;box-shadow:0 0 0 30px #e8ad4b12,0 0 0 60px #e8ad4b0b;content:"";pointer-events:none}
+.agewell-hero__eyebrow{margin:0 0 .8rem;color:#d4e6d9;font-size:.72rem;font-weight:750;letter-spacing:.15em;text-transform:uppercase}
+.agewell-hero h1{max-width:720px;margin:0;color:#fbfaf4;font-size:clamp(2.2rem,5.4vw,4.5rem);line-height:1.02;letter-spacing:-.055em}
+.agewell-hero__summary{max-width:620px;margin:.9rem 0 0;color:#e2ebe5;font-size:1.05rem;line-height:1.6}
+.agewell-hero__tag{display:inline-flex;margin-top:1.3rem;padding:.4rem .68rem;border:1px solid #e8ad4b80;border-radius:999px;color:#ffe0a4;font-size:.76rem;font-weight:650}
+[data-testid="stAlert"]{border-radius:10px}
+[data-testid="stVerticalBlockBorderWrapper"]{border-color:#dce5df!important;border-radius:14px;background:#ffffffc9}
+div[data-testid="stButton"]>button,div[data-testid="stDownloadButton"]>button{min-height:44px;border-radius:8px;font-weight:700;transition:transform .18s ease,box-shadow .18s ease}
+div[data-testid="stButton"]>button:hover,div[data-testid="stDownloadButton"]>button:hover{transform:translateY(-2px);box-shadow:0 8px 22px #173c351c}
+div[data-testid="stButton"]>button:focus-visible,div[data-testid="stDownloadButton"]>button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 input,textarea,[data-baseweb="select"]>div{border-radius:8px!important}
+.privacy-note{margin:-.45rem 0 1rem;padding:.85rem 1rem;border-left:3px solid var(--amber);background:#fff9e9;color:#51432a;font-size:.9rem;line-height:1.55}
 @keyframes agewell-result{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 .prediction-result{margin:1rem 0;padding:1.25rem clamp(1rem,3vw,1.75rem);border:1px solid #dce5df;border-left:4px solid #3c8064;border-radius:12px;background:#fff;box-shadow:0 12px 32px #173c3510;animation:agewell-result .5s cubic-bezier(.2,.7,.2,1) both}
 .prediction-result--high{border-left-color:#b45345}
@@ -31,43 +39,34 @@ input,textarea,[data-baseweb="select"]>div{border-radius:8px!important}
 .prediction-result__metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:1.25rem}
 .prediction-result__metric{display:grid;gap:4px;padding:12px 14px;border-radius:8px;background:#f3f7f4}
 .prediction-result__metric span{color:#53746b;font-size:.72rem}
-.prediction-result__metric strong{color:#173c35;font:600 1.35rem 'Manrope',sans-serif}
+.prediction-result__metric strong{color:#173c35;font:650 1.35rem system-ui,sans-serif}
 .prediction-result__advice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding-top:1rem;border-top:1px solid #e3eae5}
-.prediction-result__advice h4{margin:0 0 6px;color:#173c35;font:650 .9rem 'Manrope',sans-serif}
+.prediction-result__advice h4{margin:0 0 6px;color:#173c35;font:650 .9rem system-ui,sans-serif}
 .prediction-result__advice p{margin:0;color:#53675f;font-size:.88rem;line-height:1.6}
-@media(max-width:640px){.prediction-result__advice{grid-template-columns:1fr}}
+@media(max-width:640px){[data-testid="stMain"] .block-container{padding-top:1rem}.agewell-hero:after{right:-180px;opacity:.65}.prediction-result__advice{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 """, unsafe_allow_html=True)
 
-LOGO_PATH = "assets/agewell_logo.png"
-
-col1, col2 = st.columns([8, 2])
-with col1:
-    st.markdown("<p style='color:#53746b;font-size:.75rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin:0'>AGEWELL · RESEARCH PROTOTYPE</p><h1 style='margin:.3rem 0 .2rem'>Health signals, made clearer.</h1>", unsafe_allow_html=True)
-    st.markdown("Explore a model estimate from sample inputs. This tool is not for clinical use.")
-with col2:
-    if os.path.exists(LOGO_PATH):
-        st.image(LOGO_PATH, width=120)
-
-st.markdown("---")
+st.markdown("<section class='agewell-hero'><p class='agewell-hero__eyebrow'>AgeWell / Research prototype</p><h1>Health signals, made clearer.</h1><p class='agewell-hero__summary'>Explore how a research model responds to fictional sample values. This demo is not for clinical use.</p><span class='agewell-hero__tag'>Sample inputs only</span></section>", unsafe_allow_html=True)
 
 st.warning(
     "Research demo only. Predictions and suggestions are not a diagnosis or medical advice. "
     "Do not use this app to make care decisions or enter real patient data."
 )
 
-st.subheader("Enter patient details")
+st.subheader("Build a fictional sample")
+st.markdown("<p class='privacy-note'>The hosted demo processes values to make an estimate. It does not save predictions to a database or send alerts. If you create a PDF, it is held temporarily on the host for download. Never enter real or identifying patient information.</p>", unsafe_allow_html=True)
 synthetic_data_confirmed = st.checkbox(
     "I confirm these are fictional sample values, not real patient data."
 )
 c1, c2, c3 = st.columns(3)
 with c1:
-    age = st.number_input("Age", min_value=40, max_value=120, value=70)
-    hr = st.number_input("Heart Rate", min_value=30, max_value=200, value=80)
+    age = st.number_input("Age (years)", min_value=40, max_value=120, value=70)
+    hr = st.number_input("Heart rate (bpm)", min_value=30, max_value=200, value=80)
 with c2:
-    bp = st.number_input("Systolic BP", min_value=80, max_value=250, value=130)
-    chol = st.number_input("Cholesterol", min_value=100, max_value=400, value=200)
+    bp = st.number_input("Systolic blood pressure (mmHg)", min_value=80, max_value=250, value=130)
+    chol = st.number_input("Cholesterol (mg/dL)", min_value=100, max_value=400, value=200)
 with c3:
     weight = st.number_input("Weight (kg)", min_value=30.0, max_value=200.0, value=70.0, format="%.1f")
     height = st.number_input("Height (m)", min_value=1.0, max_value=2.2, value=1.68, format="%.2f")
@@ -144,9 +143,9 @@ if pdf_btn:
 
 st.markdown("---")
 
-st.subheader("Latest records (MySQL)")
+st.subheader("Optional local storage")
 if not DB_CONFIGURED:
-    st.info("Database storage is not configured for this demo. Predictions are not saved.")
+    st.info("Database storage is off for this demo. Sample predictions are not saved.")
 elif st.button("Refresh table from DB"):
     try:
         df = db.fetch_latest_records(limit=20)
@@ -166,4 +165,4 @@ elif st.button("Refresh table from DB"):
         st.error("Records could not be loaded. Check the database configuration and server logs.")
 
 st.markdown("---")
-st.caption("AgeWell — Enter new patient details, predict risk, download report, and optionally save to MySQL.")
+st.caption("AgeWell research demo · Fictional sample values only · Not a medical tool.")

@@ -65,6 +65,8 @@ Prediction requests do not save records or create reports unless `save_to_db` or
 python -m unittest discover -s tests -v
 ```
 
+GitHub Actions runs Python compilation and the test suite on pushes and pull requests to `main`.
+
 ## Privacy and limitations
 
 This prototype has not been clinically validated or assessed for medical use. Public hosting is intended only for synthetic sample values. The hosted service has no database or email credentials configured, and the UI disables record storage until a complete local MySQL configuration is provided. Before any real-world use, obtain clinical, privacy, security and regulatory review, and build appropriate consent, access control, retention and monitoring.
