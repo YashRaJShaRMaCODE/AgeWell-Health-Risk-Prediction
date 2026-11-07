@@ -1,9 +1,13 @@
 """CLI entry point: enter a new patient's details, predict risk, save to
 MySQL, generate a PDF report, and email an alert for high-risk patients."""
+import logging
+
 import pyttsx3
 
 from app.services.health_service import process_patient
 from app.utils import db
+
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -39,8 +43,8 @@ def main():
             f"BMI is {result.bmi} and health score is {result.health_score}."
         )
         engine.runAndWait()
-    except Exception:
-        pass
+    except Exception:  # noqa: BLE001 - optional speech output must not fail the CLI flow
+        logger.warning("Optional speech output is unavailable")
 
 
 if __name__ == "__main__":

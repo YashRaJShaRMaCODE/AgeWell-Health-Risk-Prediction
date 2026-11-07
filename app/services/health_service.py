@@ -6,7 +6,6 @@ from app.models.predictor import predict_risk
 from app.utils import db
 from app.utils.email_utils import send_high_risk_alert
 from app.utils.pdf_report import generate_health_report
-from config.config import EMAIL_ALERTS_ENABLED
 
 
 def compute_bmi(weight_kg: float, height_m: float) -> float:
@@ -72,13 +71,10 @@ def evaluate_patient(age, hr, bp, chol, weight, height) -> PredictionResult:
 
 
 def process_patient(age, hr, bp, chol, weight, height, save_to_db=False,
-                     generate_pdf=False, send_alert=None) -> PredictionResult:
+                     generate_pdf=False, send_alert=False) -> PredictionResult:
     """Full workflow: predict, optionally persist to MySQL, generate a PDF
     report, and send an email alert for high-risk patients."""
     result = evaluate_patient(age, hr, bp, chol, weight, height)
-
-    if send_alert is None:
-        send_alert = EMAIL_ALERTS_ENABLED
 
     if save_to_db:
         patient_id = db.insert_record({
