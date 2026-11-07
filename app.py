@@ -58,6 +58,9 @@ st.warning(
 )
 
 st.subheader("Enter patient details")
+synthetic_data_confirmed = st.checkbox(
+    "I confirm these are fictional sample values, not real patient data."
+)
 c1, c2, c3 = st.columns(3)
 with c1:
     age = st.number_input("Age", min_value=40, max_value=120, value=70)
@@ -72,7 +75,7 @@ with c3:
 st.write("")
 colA, colB, colC = st.columns([1, 1, 2])
 with colA:
-    predict_btn = st.button("Predict")
+    predict_btn = st.button("Predict", disabled=not synthetic_data_confirmed)
 with colB:
     pdf_btn = st.button("Download Last Report")
 with colC:
@@ -80,8 +83,8 @@ with colC:
     pdf_toggle = st.checkbox("Create a PDF report", value=False)
     alert_toggle = st.checkbox(
         "Email high-risk alert (requires saved record + PDF)",
-        value=EMAIL_ALERTS_ENABLED,
-        disabled=not (insert_toggle and pdf_toggle),
+        value=False,
+        disabled=not (EMAIL_ALERTS_ENABLED and insert_toggle and pdf_toggle),
     )
 
 if predict_btn:

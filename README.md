@@ -8,7 +8,7 @@ An educational health-risk prediction prototype with a Streamlit demo and an opt
 
 https://agewell-risk-demo.onrender.com/
 
-The hosted demo does not save predictions, generate email alerts, or connect to a database. Inputs are processed by the public hosting service, so use sample values only.
+The hosted demo does not save predictions, generate email alerts, or connect to a database. Inputs are processed by the public hosting service, so use fictional sample values only; the app requires you to confirm this before running a prediction.
 
 ## What it does
 
@@ -33,7 +33,7 @@ Start the demo:
 streamlit run app.py
 ```
 
-Optional database, report and email settings are documented in `.env.example`. Keep all real secrets in a local `.env` file and never commit them. Database storage controls stay disabled until all required MySQL settings are present. Email alerts are off by default.
+Optional database, report and email settings are documented in `.env.example`. Keep all real secrets in a local `.env` file and never commit them. Database storage controls stay disabled until all required MySQL settings are present. Email alerts require an explicit opt-in for each run and remain off in the service/API defaults.
 
 ## Optional API
 

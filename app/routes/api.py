@@ -41,7 +41,7 @@ def require_api_token():
 
 def parse_patient_payload(payload):
     if not isinstance(payload, dict):
-        raise ValueError("Request body must be a JSON object")
+        raise TypeError("Request body must be a JSON object")
 
     missing = [field for field in FIELD_RANGES if field not in payload]
     if missing:
@@ -62,7 +62,7 @@ def parse_patient_payload(payload):
     for field, default in (("save_to_db", False), ("generate_pdf", False)):
         value = payload.get(field, default)
         if not isinstance(value, bool):
-            raise ValueError(f"{field} must be a boolean")
+            raise TypeError(f"{field} must be a boolean")
         values[field] = value
     return values
 
@@ -72,7 +72,7 @@ def predict():
     payload = request.get_json(silent=True)
     try:
         values = parse_patient_payload(payload)
-    except ValueError as exc:
+    except (TypeError, ValueError) as exc:
         return jsonify({"error": str(exc)}), 400
 
     try:
@@ -86,7 +86,7 @@ def predict():
             save_to_db=values["save_to_db"],
             generate_pdf=values["generate_pdf"],
         )
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - keep internal failures out of public responses
         logger.error("AgeWell prediction failed (%s)", type(exc).__name__)
         return jsonify({"error": "Prediction could not be completed"}), 500
 
@@ -112,7 +112,7 @@ def records():
         return jsonify({"error": "limit must be an integer between 1 and 100"}), 400
     try:
         df = db.fetch_latest_records(limit=limit)
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - keep database failures out of public responses
         logger.error("AgeWell record query failed (%s)", type(exc).__name__)
         return jsonify({"error": "Records could not be retrieved"}), 500
     return jsonify(df.to_dict(orient="records"))

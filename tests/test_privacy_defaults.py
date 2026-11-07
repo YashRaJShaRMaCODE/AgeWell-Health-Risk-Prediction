@@ -33,6 +33,30 @@ class PrivacyDefaultTests(unittest.TestCase):
         insert_record.assert_not_called()
         generate_report.assert_not_called()
 
+    @patch("app.services.health_service.send_high_risk_alert")
+    @patch("app.services.health_service.generate_health_report")
+    @patch("app.services.health_service.db.insert_record", return_value=12)
+    @patch("app.services.health_service.evaluate_patient")
+    def test_high_risk_prediction_never_emails_without_explicit_opt_in(
+        self, evaluate_patient, insert_record, generate_report, send_alert
+    ):
+        evaluate_patient.return_value = PredictionResult(
+            risk=1,
+            risk_label="High",
+            bmi=28.0,
+            health_score=60,
+            food_plan="Sample plan",
+            exercise_plan="Sample plan",
+        )
+        generate_report.return_value = "sample-report.pdf"
+
+        result = process_patient(
+            65, 80, 120, 180, 65, 1.7, save_to_db=True, generate_pdf=True
+        )
+
+        self.assertFalse(result.email_sent)
+        send_alert.assert_not_called()
+
     def test_same_patient_reports_use_distinct_files(self):
         with tempfile.TemporaryDirectory() as folder:
             paths = [

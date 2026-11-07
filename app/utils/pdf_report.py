@@ -1,9 +1,12 @@
 """PDF report generation for AgeWell patient health reports."""
+import logging
 import os
 import uuid
 from datetime import datetime
 
 from fpdf import FPDF
+
+logger = logging.getLogger(__name__)
 
 
 def generate_health_report(pid, age, hr, bp, chol, bmi, score, risk, food, exercise,
@@ -29,8 +32,8 @@ def generate_health_report(pid, age, hr, bp, chol, bmi, score, risk, food, exerc
     if logo_path and os.path.exists(logo_path):
         try:
             pdf.image(logo_path, x=160, y=4, w=30)
-        except Exception:
-            pass
+        except Exception:  # noqa: BLE001 - an optional logo must not block report creation
+            logger.warning("Optional report logo could not be loaded")
 
     pdf.ln(8)
     pdf.set_text_color(*text_color)
