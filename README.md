@@ -14,7 +14,7 @@ The hosted demo does not save predictions, generate email alerts, or connect to 
 
 - Estimates a binary risk label from age, heart rate, systolic blood pressure and cholesterol.
 - Calculates a reference BMI and prototype score, then displays rule-based examples.
-- Supports optional PDF output and MySQL persistence when explicitly configured locally.
+- Shows the PDF download action as soon as an explicitly requested sample report is ready; MySQL persistence remains opt-in and local-only.
 - Provides an optional Flask API with bearer-token authentication; persistence and reports default off.
 
 ## Local setup

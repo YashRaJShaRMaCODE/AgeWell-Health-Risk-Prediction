@@ -76,7 +76,7 @@ colA, colB, colC = st.columns([1, 1, 2])
 with colA:
     predict_btn = st.button("Predict", disabled=not synthetic_data_confirmed)
 with colB:
-    pdf_btn = st.button("Download Last Report")
+    pdf_slot = st.empty()
 with colC:
     insert_toggle = st.checkbox("Save record to MySQL", value=False, disabled=not DB_CONFIGURED)
     pdf_toggle = st.checkbox("Create a PDF report", value=False)
@@ -134,12 +134,20 @@ if predict_btn:
             else:
                 st.warning("Email alert not sent — check EMAIL_* environment variables.")
 
-if pdf_btn:
-    if "last_pdf" in st.session_state and os.path.exists(st.session_state["last_pdf"]):
-        with open(st.session_state["last_pdf"], "rb") as f:
-            st.download_button("Download report PDF", f, file_name=os.path.basename(st.session_state["last_pdf"]))
-    else:
-        st.warning("No report generated yet. Click Predict first.")
+last_pdf = st.session_state.get("last_pdf")
+pdf_ready = bool(last_pdf and os.path.isfile(last_pdf))
+pdf_data = b""
+if pdf_ready:
+    with open(last_pdf, "rb") as report_file:
+        pdf_data = report_file.read()
+pdf_slot.download_button(
+    "Download report PDF",
+    data=pdf_data,
+    file_name=os.path.basename(last_pdf) if pdf_ready else "AgeWell_Report.pdf",
+    mime="application/pdf",
+    disabled=not pdf_ready,
+    help="Enable PDF report before predicting to create a downloadable report.",
+)
 
 st.markdown("---")
 
