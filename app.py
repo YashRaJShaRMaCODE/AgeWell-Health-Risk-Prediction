@@ -57,7 +57,7 @@ st.warning(
 )
 
 st.subheader("Build a fictional sample")
-st.markdown("<p class='privacy-note'>The hosted demo processes values to make an estimate. It does not save predictions to a database or send alerts. If you create a PDF, it is held temporarily on the host for download. Never enter real or identifying patient information.</p>", unsafe_allow_html=True)
+st.markdown("<p class='privacy-note'>The hosted demo processes values to make an estimate. It does not save predictions to a database or send alerts. If you create a PDF, its temporary file is deleted after the report is loaded into this session's memory. Clear the session copy when you are done. Never enter real or identifying patient information.</p>", unsafe_allow_html=True)
 synthetic_data_confirmed = st.checkbox(
     "I confirm these are fictional sample values, not real patient data."
 )

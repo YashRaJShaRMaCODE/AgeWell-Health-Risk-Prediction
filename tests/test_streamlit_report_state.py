@@ -12,6 +12,14 @@ class StreamlitReportStateTests(unittest.TestCase):
         app.run()
 
         self.assertFalse(app.exception)
+        privacy_notice = next(
+            element.value
+            for element in app.get("markdown")
+            if "The hosted demo processes values" in element.value
+        )
+        self.assertIn("temporary file is deleted", privacy_notice)
+        self.assertIn("this session's memory", privacy_notice)
+        self.assertNotIn("held temporarily on the host", privacy_notice)
         self.assertEqual(len(app.get("download_button")), 1)
         app.button(key="clear-agewell-report").click().run()
 
