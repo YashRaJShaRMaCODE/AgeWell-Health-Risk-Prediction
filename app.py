@@ -7,6 +7,7 @@ import streamlit as st
 
 from app.services.health_service import process_patient
 from app.utils import db
+from app.utils.temporary_report import read_and_remove_report
 from config.config import DB_CONFIGURED, EMAIL_ALERTS_ENABLED
 
 logger = logging.getLogger(__name__)
@@ -87,6 +88,7 @@ with colC:
     )
 
 if predict_btn:
+    st.session_state.pop("last_pdf_data", None)
     previous_pdf = st.session_state.pop("last_pdf", None)
     if previous_pdf and os.path.isfile(previous_pdf):
         os.remove(previous_pdf)
@@ -125,8 +127,12 @@ if predict_btn:
                 st.error("DB insert failed — check DB_* environment variables and MySQL connectivity.")
 
         if result.pdf_file:
-            st.info("PDF report generated. It is stored on this server until your next prediction.")
-            st.session_state["last_pdf"] = result.pdf_file
+            try:
+                st.session_state["last_pdf_data"] = read_and_remove_report(result.pdf_file)
+                st.info("The PDF is held in this session's memory. Clear it below when you are done.")
+            except OSError:
+                logger.exception("AgeWell temporary report could not be read and removed")
+                st.warning("The report could not be prepared for download. The prediction is still available.")
 
         if alert_toggle and result.risk == 1:
             if result.email_sent:
@@ -134,20 +140,19 @@ if predict_btn:
             else:
                 st.warning("Email alert not sent — check EMAIL_* environment variables.")
 
-last_pdf = st.session_state.get("last_pdf")
-pdf_ready = bool(last_pdf and os.path.isfile(last_pdf))
-pdf_data = b""
-if pdf_ready:
-    with open(last_pdf, "rb") as report_file:
-        pdf_data = report_file.read()
+pdf_data = st.session_state.get("last_pdf_data", b"")
+pdf_ready = bool(pdf_data)
 pdf_slot.download_button(
     "Download report PDF",
     data=pdf_data,
-    file_name=os.path.basename(last_pdf) if pdf_ready else "AgeWell_Report.pdf",
+    file_name="AgeWell_Report.pdf",
     mime="application/pdf",
     disabled=not pdf_ready,
     help="Enable PDF report before predicting to create a downloadable report.",
 )
+if pdf_ready and st.button("Clear temporary report", key="clear-agewell-report"):
+    st.session_state.pop("last_pdf_data", None)
+    st.rerun()
 
 st.markdown("---")
 

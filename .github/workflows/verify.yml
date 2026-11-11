@@ -20,7 +20,9 @@ jobs:
           cache: pip
           cache-dependency-path: requirements.txt
       - name: Install application dependencies
-        run: python -m pip install -r requirements.txt
+        run: python -m pip install -r requirements.txt ruff==0.17.4
+      - name: Lint Python sources
+        run: python -m ruff check app.py app config tests
       - name: Compile Python sources
         run: python -m compileall -q app config tests
       - name: Run tests
