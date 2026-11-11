@@ -26,6 +26,22 @@ class StreamlitReportStateTests(unittest.TestCase):
         self.assertFalse(app.exception)
         self.assertNotIn("last_pdf_data", app.session_state)
 
+    def test_reset_clears_inputs_confirmation_and_report_bytes(self):
+        app_path = Path(__file__).resolve().parents[1] / "app.py"
+        app = AppTest.from_file(str(app_path), default_timeout=30)
+        app.session_state["synthetic_data_confirmed"] = True
+        app.session_state["age"] = 88
+        app.session_state["last_pdf_data"] = b"sample report"
+        app.run()
+
+        self.assertFalse(app.exception)
+        app.button(key="reset-agewell-sample").click().run()
+
+        self.assertFalse(app.exception)
+        self.assertFalse(app.session_state["synthetic_data_confirmed"])
+        self.assertEqual(app.session_state["age"], 70)
+        self.assertNotIn("last_pdf_data", app.session_state)
+
 
 if __name__ == "__main__":
     unittest.main()

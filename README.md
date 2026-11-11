@@ -8,7 +8,7 @@ An educational health-risk prediction prototype with a Streamlit demo and an opt
 
 https://agewell-risk-demo.onrender.com/
 
-The hosted demo does not save predictions, generate email alerts, or connect to a database. Inputs are processed by the public hosting service, so use fictional sample values only; the app requires you to confirm this before running a prediction. If you request a PDF, the generated file is removed immediately after its bytes are loaded into the current Streamlit session for download; you can clear those session bytes with the visible control.
+The hosted demo does not save predictions, generate email alerts, or connect to a database. Inputs are processed by the public hosting service, so use fictional sample values only; the app requires you to confirm this before running a prediction. If you request a PDF, the generated file is removed immediately after its bytes are loaded into the current Streamlit session for download. Use **Reset fictional sample** to clear entered values, consent, options and any session-held report bytes.
 
 ## What it does
 

@@ -1,7 +1,6 @@
 """Streamlit UI entry point for AgeWell."""
 import html
 import logging
-import os
 
 import streamlit as st
 
@@ -11,6 +10,15 @@ from app.utils.temporary_report import read_and_remove_report
 from config.config import DB_CONFIGURED, EMAIL_ALERTS_ENABLED
 
 logger = logging.getLogger(__name__)
+
+
+def reset_sample():
+    for key in (
+        "last_pdf_data", "synthetic_data_confirmed", "age", "heart_rate",
+        "systolic_bp", "cholesterol", "weight", "height", "save_to_db",
+        "create_pdf", "send_alert",
+    ):
+        st.session_state.pop(key, None)
 
 st.set_page_config(page_title="AgeWell · Research Demo", page_icon="🩺", layout="wide")
 
@@ -59,18 +67,19 @@ st.warning(
 st.subheader("Build a fictional sample")
 st.markdown("<p class='privacy-note'>The hosted demo processes values to make an estimate. It does not save predictions to a database or send alerts. If you create a PDF, its temporary file is deleted after the report is loaded into this session's memory. Clear the session copy when you are done. Never enter real or identifying patient information.</p>", unsafe_allow_html=True)
 synthetic_data_confirmed = st.checkbox(
-    "I confirm these are fictional sample values, not real patient data."
+    "I confirm these are fictional sample values, not real patient data.",
+    key="synthetic_data_confirmed",
 )
 c1, c2, c3 = st.columns(3)
 with c1:
-    age = st.number_input("Age (years)", min_value=40, max_value=120, value=70)
-    hr = st.number_input("Heart rate (bpm)", min_value=30, max_value=200, value=80)
+    age = st.number_input("Age (years)", min_value=40, max_value=120, value=70, key="age")
+    hr = st.number_input("Heart rate (bpm)", min_value=30, max_value=200, value=80, key="heart_rate")
 with c2:
-    bp = st.number_input("Systolic blood pressure (mmHg)", min_value=80, max_value=250, value=130)
-    chol = st.number_input("Cholesterol (mg/dL)", min_value=100, max_value=400, value=200)
+    bp = st.number_input("Systolic blood pressure (mmHg)", min_value=80, max_value=250, value=130, key="systolic_bp")
+    chol = st.number_input("Cholesterol (mg/dL)", min_value=100, max_value=400, value=200, key="cholesterol")
 with c3:
-    weight = st.number_input("Weight (kg)", min_value=30.0, max_value=200.0, value=70.0, format="%.1f")
-    height = st.number_input("Height (m)", min_value=1.0, max_value=2.2, value=1.68, format="%.2f")
+    weight = st.number_input("Weight (kg)", min_value=30.0, max_value=200.0, value=70.0, format="%.1f", key="weight")
+    height = st.number_input("Height (m)", min_value=1.0, max_value=2.2, value=1.68, format="%.2f", key="height")
 
 st.write("")
 colA, colB, colC = st.columns([1, 1, 2])
@@ -79,19 +88,24 @@ with colA:
 with colB:
     pdf_slot = st.empty()
 with colC:
-    insert_toggle = st.checkbox("Save record to MySQL", value=False, disabled=not DB_CONFIGURED)
-    pdf_toggle = st.checkbox("Create a PDF report", value=False)
+    insert_toggle = st.checkbox("Save record to MySQL", value=False, disabled=not DB_CONFIGURED, key="save_to_db")
+    pdf_toggle = st.checkbox("Create a PDF report", value=False, key="create_pdf")
     alert_toggle = st.checkbox(
         "Email high-risk alert (requires saved record + PDF)",
         value=False,
         disabled=not (EMAIL_ALERTS_ENABLED and insert_toggle and pdf_toggle),
+        key="send_alert",
     )
+
+st.button(
+    "Reset fictional sample",
+    key="reset-agewell-sample",
+    on_click=reset_sample,
+    help="Clear entered values, the fictional-data confirmation and any temporary report in this session.",
+)
 
 if predict_btn:
     st.session_state.pop("last_pdf_data", None)
-    previous_pdf = st.session_state.pop("last_pdf", None)
-    if previous_pdf and os.path.isfile(previous_pdf):
-        os.remove(previous_pdf)
     with st.spinner("Predicting..."):
         try:
             result = process_patient(
