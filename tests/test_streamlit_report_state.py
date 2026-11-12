@@ -12,6 +12,10 @@ class StreamlitReportStateTests(unittest.TestCase):
         app.run()
 
         self.assertFalse(app.exception)
+        disclosures = [element.value for element in app.get("markdown")]
+        estimate_note = next(value for value in disclosures if "The classifier uses age" in value)
+        self.assertIn("not a probability", estimate_note)
+        self.assertIn("separate rule-based outputs", estimate_note)
         privacy_notice = next(
             element.value
             for element in app.get("markdown")

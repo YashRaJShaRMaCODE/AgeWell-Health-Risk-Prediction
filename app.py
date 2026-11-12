@@ -80,6 +80,11 @@ st.warning(
     "Research demo only. Predictions and suggestions are not a diagnosis or medical advice. "
     "Do not use this app to make care decisions or enter real patient data."
 )
+with st.expander("How the research estimate is formed"):
+    st.markdown(
+        "The classifier uses age, heart rate, systolic blood pressure and cholesterol to return a high/low label, not a probability. "
+        "Height and weight are used for a BMI reference; the prototype score and food/activity examples are separate rule-based outputs."
+    )
 
 st.subheader("Build a fictional sample")
 st.markdown("<p class='privacy-note'>The hosted demo processes values to make an estimate. It does not save predictions to a database or send alerts. If you create a PDF, its temporary file is deleted after the report is loaded into this session's memory. Clear the session copy when you are done. Never enter real or identifying patient information.</p>", unsafe_allow_html=True)
