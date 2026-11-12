@@ -42,6 +42,26 @@ class StreamlitReportStateTests(unittest.TestCase):
         self.assertEqual(app.session_state["age"], 70)
         self.assertNotIn("last_pdf_data", app.session_state)
 
+    def test_fictional_example_requires_fresh_confirmation_and_clears_outputs(self):
+        app_path = Path(__file__).resolve().parents[1] / "app.py"
+        app = AppTest.from_file(str(app_path), default_timeout=30)
+        app.session_state["synthetic_data_confirmed"] = True
+        app.session_state["create_pdf"] = True
+        app.session_state["send_alert"] = True
+        app.session_state["last_pdf_data"] = b"previous report"
+        app.run()
+
+        self.assertFalse(app.exception)
+        app.button(key="load-example-sample-b").click().run()
+
+        self.assertFalse(app.exception)
+        self.assertEqual(app.session_state["age"], 78)
+        self.assertEqual(app.session_state["heart_rate"], 88)
+        self.assertFalse(app.session_state["synthetic_data_confirmed"])
+        self.assertFalse(app.session_state["create_pdf"])
+        self.assertFalse(app.session_state["send_alert"])
+        self.assertNotIn("last_pdf_data", app.session_state)
+
 
 if __name__ == "__main__":
     unittest.main()

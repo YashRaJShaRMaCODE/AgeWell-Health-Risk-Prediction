@@ -11,6 +11,23 @@ from config.config import DB_CONFIGURED, EMAIL_ALERTS_ENABLED
 
 logger = logging.getLogger(__name__)
 
+FICTIONAL_SAMPLES = {
+    "A": {"age": 65, "heart_rate": 76, "systolic_bp": 124, "cholesterol": 195, "weight": 68.0, "height": 1.65},
+    "B": {"age": 78, "heart_rate": 88, "systolic_bp": 142, "cholesterol": 230, "weight": 74.0, "height": 1.72},
+}
+
+
+def load_fictional_sample(name):
+    sample = FICTIONAL_SAMPLES.get(name)
+    if not sample:
+        return
+    st.session_state.update(sample)
+    st.session_state["synthetic_data_confirmed"] = False
+    st.session_state["save_to_db"] = False
+    st.session_state["create_pdf"] = False
+    st.session_state["send_alert"] = False
+    st.session_state.pop("last_pdf_data", None)
+
 
 def reset_sample():
     for key in (
@@ -66,6 +83,12 @@ st.warning(
 
 st.subheader("Build a fictional sample")
 st.markdown("<p class='privacy-note'>The hosted demo processes values to make an estimate. It does not save predictions to a database or send alerts. If you create a PDF, its temporary file is deleted after the report is loaded into this session's memory. Clear the session copy when you are done. Never enter real or identifying patient information.</p>", unsafe_allow_html=True)
+st.caption("Quick start with fictional values. Choosing an example clears confirmation and optional outputs; review the values and confirm again before predicting.")
+sample_a, sample_b = st.columns(2)
+with sample_a:
+    st.button("Load fictional example A", key="load-example-sample-a", on_click=load_fictional_sample, args=("A",))
+with sample_b:
+    st.button("Load fictional example B", key="load-example-sample-b", on_click=load_fictional_sample, args=("B",))
 synthetic_data_confirmed = st.checkbox(
     "I confirm these are fictional sample values, not real patient data.",
     key="synthetic_data_confirmed",
