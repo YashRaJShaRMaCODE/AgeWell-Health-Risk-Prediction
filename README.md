@@ -51,7 +51,7 @@ python -m app.routes.api
 - `POST /predict` — requires `Authorization: Bearer <token>` and a JSON body containing `age`, `heart_rate`, `systolic_bp`, `cholesterol`, `weight`, and `height`.
 - `GET /records` — requires the same bearer token and a configured MySQL database.
 
-Prediction requests do not save records or create reports unless `save_to_db` or `generate_pdf` is explicitly set to `true`. Do not expose a token in browser code, logs, screenshots or a public repository.
+Prediction requests do not save records or create reports unless `save_to_db` or `generate_pdf` is explicitly set to `true`. When `generate_pdf` is true, `POST /predict` returns the report as an `application/pdf` attachment, with risk label, BMI and prototype score in response headers; its temporary server file is removed after reading. Treat the downloaded report as sensitive health information. Do not expose a token in browser code, logs, screenshots or a public repository.
 
 ## Project map
 

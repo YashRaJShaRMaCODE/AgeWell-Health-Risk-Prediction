@@ -3,10 +3,11 @@ import hmac
 import logging
 import math
 
-from flask import Flask, jsonify, request
+from flask import Flask, Response, jsonify, request
 
 from app.services.health_service import process_patient
 from app.utils import db
+from app.utils.temporary_report import read_and_remove_report
 from config.config import API_AUTH_TOKEN
 
 app = Flask(__name__)
@@ -89,6 +90,19 @@ def predict():
     except Exception as exc:  # noqa: BLE001 - keep internal failures out of public responses
         logger.error("AgeWell prediction failed (%s)", type(exc).__name__)
         return jsonify({"error": "Prediction could not be completed"}), 500
+
+    if result.pdf_file is not None:
+        try:
+            pdf_bytes = read_and_remove_report(result.pdf_file)
+        except Exception as exc:  # noqa: BLE001 - keep internal failures out of public responses
+            logger.error("AgeWell report could not be read (%s)", type(exc).__name__)
+            return jsonify({"error": "Report could not be completed"}), 500
+        response = Response(pdf_bytes, mimetype="application/pdf")
+        response.headers["Content-Disposition"] = 'attachment; filename="AgeWell-Research-Report.pdf"'
+        response.headers["X-AgeWell-Risk"] = result.risk_label
+        response.headers["X-AgeWell-BMI"] = str(result.bmi)
+        response.headers["X-AgeWell-Health-Score"] = str(result.health_score)
+        return response
 
     return jsonify({
         "patient_id": result.patient_id,
