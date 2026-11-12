@@ -62,6 +62,13 @@ input,textarea,[data-baseweb="select"]>div{border-radius:8px!important}
 .prediction-result{margin:1rem 0;padding:1.25rem clamp(1rem,3vw,1.75rem);border:1px solid #dce5df;border-left:4px solid #3c8064;border-radius:12px;background:#fff;box-shadow:0 12px 32px #173c3510;animation:agewell-result .5s cubic-bezier(.2,.7,.2,1) both}
 .prediction-result--high{border-left-color:#b45345}
 .prediction-result__heading{margin:0 0 1rem;color:#53746b;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.prediction-result__inputs{margin-bottom:1.25rem;padding:14px 16px;border:1px solid #e3eae5;border-radius:8px;background:#f8faf7}
+.prediction-result__inputs-title{margin:0 0 10px;color:#173c35;font-size:.82rem;font-weight:700}
+.prediction-result__input-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0}
+.prediction-result__input-grid div{display:grid;gap:3px}
+.prediction-result__input-grid dt{color:#53746b;font-size:.7rem}
+.prediction-result__input-grid dd{margin:0;color:#173c35;font-size:.88rem;font-weight:650}
+.prediction-result__inputs-note{margin:10px 0 0;color:#53675f;font-size:.76rem;line-height:1.45}
 .prediction-result__metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:1.25rem}
 .prediction-result__metric{display:grid;gap:4px;padding:12px 14px;border-radius:8px;background:#f3f7f4}
 .prediction-result__metric span{color:#53746b;font-size:.72rem}
@@ -69,7 +76,7 @@ input,textarea,[data-baseweb="select"]>div{border-radius:8px!important}
 .prediction-result__advice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding-top:1rem;border-top:1px solid #e3eae5}
 .prediction-result__advice h4{margin:0 0 6px;color:#173c35;font:650 .9rem system-ui,sans-serif}
 .prediction-result__advice p{margin:0;color:#53675f;font-size:.88rem;line-height:1.6}
-@media(max-width:640px){[data-testid="stMain"] .block-container{padding-top:1rem}.agewell-hero:after{right:-180px;opacity:.65}.prediction-result__advice{grid-template-columns:1fr}}
+@media(max-width:640px){[data-testid="stMain"] .block-container{padding-top:1rem}.agewell-hero:after{right:-180px;opacity:.65}.prediction-result__advice{grid-template-columns:1fr}.prediction-result__input-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 """, unsafe_allow_html=True)
@@ -150,6 +157,16 @@ if predict_btn:
         st.markdown(f"""
         <section class="prediction-result prediction-result--{risk_style}" aria-label="Research model estimate">
           <p class="prediction-result__heading">Model estimate · not clinically validated</p>
+          <div class="prediction-result__inputs" role="group" aria-label="Inputs used for the research model label">
+            <p class="prediction-result__inputs-title">Inputs used for the label</p>
+            <dl class="prediction-result__input-grid">
+              <div><dt>Age</dt><dd>{html.escape(str(age))} years</dd></div>
+              <div><dt>Heart rate</dt><dd>{html.escape(str(hr))} bpm</dd></div>
+              <div><dt>Systolic pressure</dt><dd>{html.escape(str(bp))} mmHg</dd></div>
+              <div><dt>Cholesterol</dt><dd>{html.escape(str(chol))} mg/dL</dd></div>
+            </dl>
+            <p class="prediction-result__inputs-note">Height and weight are used for the BMI reference only, not this label.</p>
+          </div>
           <div class="prediction-result__metrics">
             <div class="prediction-result__metric"><span>Estimated risk</span><strong>{html.escape(result.risk_label)} risk</strong></div>
             <div class="prediction-result__metric"><span>BMI · reference only</span><strong>{html.escape(str(result.bmi))}</strong></div>

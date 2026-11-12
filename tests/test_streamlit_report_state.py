@@ -5,6 +5,24 @@ from streamlit.testing.v1 import AppTest
 
 
 class StreamlitReportStateTests(unittest.TestCase):
+    def test_prediction_shows_classifier_inputs_separately_from_bmi_fields(self):
+        app_path = Path(__file__).resolve().parents[1] / "app.py"
+        app = AppTest.from_file(str(app_path), default_timeout=30)
+        app.session_state["synthetic_data_confirmed"] = True
+        app.run()
+        next(button for button in app.get("button") if button.label == "Predict").click().run()
+
+        self.assertFalse(app.exception)
+        result = next(
+            element.value
+            for element in app.get("markdown")
+            if "Inputs used for the label" in element.value
+        )
+        self.assertIn("Heart rate", result)
+        self.assertIn("Systolic pressure", result)
+        self.assertIn("Cholesterol", result)
+        self.assertIn("Height and weight are used for the BMI reference only, not this label.", result)
+
     def test_report_bytes_are_cleared_from_the_session_on_request(self):
         app_path = Path(__file__).resolve().parents[1] / "app.py"
         app = AppTest.from_file(str(app_path), default_timeout=30)
