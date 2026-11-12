@@ -73,6 +73,7 @@ input,textarea,[data-baseweb="select"]>div{border-radius:8px!important}
 .prediction-result__metric{display:grid;gap:4px;padding:12px 14px;border-radius:8px;background:#f3f7f4}
 .prediction-result__metric span{color:#53746b;font-size:.72rem}
 .prediction-result__metric strong{color:#173c35;font:650 1.35rem system-ui,sans-serif}
+.prediction-result__score-note{margin:-.4rem 0 1.25rem;padding:.7rem .85rem;border-left:3px solid #e8ad4b;background:#fff9e9;color:#51432a;font-size:.76rem;line-height:1.5}
 .prediction-result__advice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding-top:1rem;border-top:1px solid #e3eae5}
 .prediction-result__advice h4{margin:0 0 6px;color:#173c35;font:650 .9rem system-ui,sans-serif}
 .prediction-result__advice p{margin:0;color:#53675f;font-size:.88rem;line-height:1.6}
@@ -172,6 +173,7 @@ if predict_btn:
             <div class="prediction-result__metric"><span>BMI · reference only</span><strong>{html.escape(str(result.bmi))}</strong></div>
             <div class="prediction-result__metric"><span>Prototype health score</span><strong>{html.escape(str(result.health_score))}</strong></div>
           </div>
+          <p class="prediction-result__score-note">Prototype score uses code-defined rules, not clinical cutoffs: starts at 100; subtracts 30 for systolic BP &gt;140 mmHg or cholesterol &gt;220 mg/dL, 20 for heart rate &gt;100 bpm, 10 for age &gt;70, and 20 for a High model label; floor 0. It is not a probability or clinical measure. BMI does not affect this score.</p>
           <div class="prediction-result__advice">
             <div><h4>Food plan</h4><p>{html.escape(result.food_plan)}</p></div>
             <div><h4>Exercise plan</h4><p>{html.escape(result.exercise_plan)}</p></div>

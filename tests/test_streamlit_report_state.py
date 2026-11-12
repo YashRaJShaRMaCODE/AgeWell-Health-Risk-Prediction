@@ -22,6 +22,8 @@ class StreamlitReportStateTests(unittest.TestCase):
         self.assertIn("Systolic pressure", result)
         self.assertIn("Cholesterol", result)
         self.assertIn("Height and weight are used for the BMI reference only, not this label.", result)
+        self.assertIn("Prototype score uses code-defined rules, not clinical cutoffs", result)
+        self.assertIn("BMI does not affect this score", result)
 
     def test_report_bytes_are_cleared_from_the_session_on_request(self):
         app_path = Path(__file__).resolve().parents[1] / "app.py"
