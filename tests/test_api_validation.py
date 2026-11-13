@@ -34,6 +34,19 @@ class ApiValidationTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.get_json(), {"error": "Request body must be a JSON object"})
+        self.assertEqual(response.headers["Cache-Control"], "no-store")
+        self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
+
+    def test_unknown_fields_are_rejected(self):
+        response = self.post_json({
+            "age": 65, "heart_rate": 80, "systolic_bp": 120,
+            "cholesterol": 180, "weight": 65, "height": 1.7,
+            "send_alert": True,
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.get_json(), {"error": "Unknown fields: send_alert"})
+        self.assertEqual(response.headers["Cache-Control"], "no-store")
 
     def test_non_boolean_privacy_flags_return_a_client_error(self):
         response = self.post_json({
@@ -70,6 +83,8 @@ class ApiValidationTests(unittest.TestCase):
         self.assertEqual(response.mimetype, "application/pdf")
         self.assertEqual(response.data, b"%PDF-test")
         self.assertEqual(response.headers["X-AgeWell-Risk"], "Low")
+        self.assertEqual(response.headers["Cache-Control"], "no-store")
+        self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
         self.assertFalse(report.exists())
 
 

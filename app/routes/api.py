@@ -22,6 +22,15 @@ FIELD_RANGES = {
     "weight": (30, 200, False),
     "height": (1, 2.2, False),
 }
+ALLOWED_PAYLOAD_FIELDS = {*FIELD_RANGES, "save_to_db", "generate_pdf"}
+
+
+@app.after_request
+def add_api_security_headers(response):
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    if request.endpoint in {"predict", "records"}:
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @app.before_request
@@ -43,6 +52,10 @@ def require_api_token():
 def parse_patient_payload(payload):
     if not isinstance(payload, dict):
         raise TypeError("Request body must be a JSON object")
+
+    unknown = sorted(set(payload) - ALLOWED_PAYLOAD_FIELDS)
+    if unknown:
+        raise ValueError(f"Unknown fields: {', '.join(unknown)}")
 
     missing = [field for field in FIELD_RANGES if field not in payload]
     if missing:

@@ -66,6 +66,18 @@ class StreamlitReportStateTests(unittest.TestCase):
         self.assertEqual(app.session_state["age"], 70)
         self.assertNotIn("last_pdf_data", app.session_state)
 
+    def test_changing_an_input_clears_a_report_for_the_previous_sample(self):
+        app_path = Path(__file__).resolve().parents[1] / "app.py"
+        app = AppTest.from_file(str(app_path), default_timeout=30)
+        app.session_state["last_pdf_data"] = b"sample report"
+        app.run()
+
+        self.assertFalse(app.exception)
+        app.number_input(key="age").set_value(71).run()
+
+        self.assertFalse(app.exception)
+        self.assertNotIn("last_pdf_data", app.session_state)
+
     def test_fictional_example_requires_fresh_confirmation_and_clears_outputs(self):
         app_path = Path(__file__).resolve().parents[1] / "app.py"
         app = AppTest.from_file(str(app_path), default_timeout=30)

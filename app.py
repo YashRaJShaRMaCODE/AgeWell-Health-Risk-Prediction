@@ -37,6 +37,10 @@ def reset_sample():
     ):
         st.session_state.pop(key, None)
 
+
+def clear_temporary_report():
+    st.session_state.pop("last_pdf_data", None)
+
 st.set_page_config(page_title="AgeWell · Research Demo", page_icon="🩺", layout="wide")
 
 st.markdown("""
@@ -108,14 +112,14 @@ synthetic_data_confirmed = st.checkbox(
 )
 c1, c2, c3 = st.columns(3)
 with c1:
-    age = st.number_input("Age (years)", min_value=40, max_value=120, value=70, key="age")
-    hr = st.number_input("Heart rate (bpm)", min_value=30, max_value=200, value=80, key="heart_rate")
+    age = st.number_input("Age (years)", min_value=40, max_value=120, value=70, key="age", on_change=clear_temporary_report)
+    hr = st.number_input("Heart rate (bpm)", min_value=30, max_value=200, value=80, key="heart_rate", on_change=clear_temporary_report)
 with c2:
-    bp = st.number_input("Systolic blood pressure (mmHg)", min_value=80, max_value=250, value=130, key="systolic_bp")
-    chol = st.number_input("Cholesterol (mg/dL)", min_value=100, max_value=400, value=200, key="cholesterol")
+    bp = st.number_input("Systolic blood pressure (mmHg)", min_value=80, max_value=250, value=130, key="systolic_bp", on_change=clear_temporary_report)
+    chol = st.number_input("Cholesterol (mg/dL)", min_value=100, max_value=400, value=200, key="cholesterol", on_change=clear_temporary_report)
 with c3:
-    weight = st.number_input("Weight (kg)", min_value=30.0, max_value=200.0, value=70.0, format="%.1f", key="weight")
-    height = st.number_input("Height (m)", min_value=1.0, max_value=2.2, value=1.68, format="%.2f", key="height")
+    weight = st.number_input("Weight (kg)", min_value=30.0, max_value=200.0, value=70.0, format="%.1f", key="weight", on_change=clear_temporary_report)
+    height = st.number_input("Height (m)", min_value=1.0, max_value=2.2, value=1.68, format="%.2f", key="height", on_change=clear_temporary_report)
 
 st.write("")
 colA, colB, colC = st.columns([1, 1, 2])
